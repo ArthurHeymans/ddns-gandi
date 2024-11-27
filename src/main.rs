@@ -15,9 +15,21 @@ struct DnsConfig {
     records: Vec<String>,
 }
 
-async fn get_public_ip(ipv4: bool) -> Option<String> {
-    let ip_type = if ipv4 { "" } else { "6" };
-    let str_ip_type = if ipv4 { "v4" } else { "v6" };
+#[derive(Debug, Clone, Copy)]
+enum IpVersion {
+    V4,
+    V6,
+}
+
+async fn get_public_ip(version: IpVersion) -> Option<String> {
+    let ip_type = match version {
+        IpVersion::V4 => "",
+        IpVersion::V6 => "6",
+    };
+    let str_ip_type = match version {
+        IpVersion::V4 => "v4",
+        IpVersion::V6 => "v6",
+    };
 
     let url = format!("https://api{}.ipify.org?format=json", ip_type);
     let response = reqwest::get(&url).await.ok()?;
@@ -35,8 +47,8 @@ async fn get_public_ip(ipv4: bool) -> Option<String> {
 }
 
 async fn get_public_ips() -> (Option<String>, Option<String>) {
-    let ip4 = get_public_ip(true).await;
-    let ip6 = get_public_ip(false).await;
+    let ip4 = get_public_ip(IpVersion::V4).await;
+    let ip6 = get_public_ip(IpVersion::V6).await;
     (ip4, ip6)
 }
 
