@@ -1,4 +1,4 @@
-# Rust DDNS Client
+# Rust Gandi DDNS Client
 
 A robust and extensible Dynamic DNS (DDNS) client written in Rust, designed to automatically update DNS records with your current public IP addresses.
 
@@ -40,11 +40,7 @@ key = "your_gandi_api_key"
 
 [DNS]
 domain = "yourdomain.com"
-records = """
-@
-www
-subdomain
-"""
+records = "record"
 ```
 
 ## Usage
@@ -60,15 +56,6 @@ The client will:
 2. Compare them with existing DNS records
 3. Update the records if changes are detected
 
-## Customization
-
-The client is designed to be extensible. You can:
-
-- Add support for new DNS providers
-- Implement custom IP address detection methods
-- Configure retry strategies and timeouts
-- Add custom logging and monitoring
-
 ## Error Handling
 
 The client includes comprehensive error handling for:
@@ -76,14 +63,6 @@ The client includes comprehensive error handling for:
 - API authentication failures
 - DNS record update problems
 - Configuration errors
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit pull requests or open issues for:
-- Bug fixes
-- New features
-- Documentation improvements
-- Code optimizations
 
 ## License
 
