@@ -2,9 +2,7 @@ use config::{Config, ConfigError, File};
 use log::{error, info, warn};
 use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION};
 use serde_json::Value;
-use std::error::Error;
 use std::process;
-use std::str::FromStr;
 
 const REST_URL: &str = "https://api.gandi.net/v5/livedns/";
 
