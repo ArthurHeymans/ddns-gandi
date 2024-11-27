@@ -160,50 +160,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let (ipv4, ipv6) = get_public_ips().await;
 
+    let ip_configs = [
+        (ipv4.as_ref(), "A"),
+        (ipv6.as_ref(), "AAAA"),
+    ];
+
     let mut n_changed = 0;
     for record in &config.records {
         info!("\tUpdating the entries of {}@{} ...", record, config.domain);
 
-        if let Some(ref ipv4) = ipv4 {
-            let gandi_ipv4 = get_gandi_record(&config.domain, record, "A", &headers).await;
+        for (ip, dns_type) in ip_configs.iter() {
+            if let Some(ip) = ip {
+                let gandi_record = get_gandi_record(&config.domain, record, dns_type, &headers).await;
 
-            if let Some(gandi_ipv4) = gandi_ipv4 {
-                if gandi_ipv4.is_empty() {
-                    warn!(
-                        "Warning! The record {}/A is empty, and thus cannot be updated!",
-                        record
-                    );
-                } else {
-                    if update_gandi_record(&config.domain, record, "A", &ipv4, &headers).await? {
-                        n_changed += 1;
+                if let Some(gandi_record) = gandi_record {
+                    if gandi_record.is_empty() {
+                        warn!(
+                            "Warning! The record {}/{} is empty, and thus cannot be updated!",
+                            record, dns_type
+                        );
+                    } else {
+                        if update_gandi_record(&config.domain, record, dns_type, ip, &headers).await? {
+                            n_changed += 1;
+                        }
                     }
-                }
-            } else {
-                warn!(
-                    "Warning! The record {}/A does not exist, and thus cannot be updated!",
-                    record
-                );
-            }
-        }
-        if let Some(ref ipv6) = ipv6 {
-            let gandi_ipv6 = get_gandi_record(&config.domain, record, "AAAA", &headers).await;
-
-            if let Some(gandi_ipv6) = gandi_ipv6 {
-                if gandi_ipv6.is_empty() {
-                    warn!(
-                        "Warning! The record {}/AAAA is empty, and thus cannot be updated!",
-                        record
-                    );
                 } else {
-                    if update_gandi_record(&config.domain, record, "AAAA", &ipv6, &headers).await? {
-                        n_changed += 1;
-                    }
+                    warn!(
+                        "Warning! The record {}/{} does not exist, and thus cannot be updated!",
+                        record, dns_type
+                    );
                 }
-            } else {
-                warn!(
-                    "Warning! The record {}/AAAA does not exist, and thus cannot be updated!",
-                    record
-                );
             }
         }
     }
